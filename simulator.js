@@ -36,11 +36,12 @@ const determinarCriticidad = (vatios, voltaje) => {
 };
 
 const generarMetrica = () => {
-  const nodo_id  = NODOS_IDS[Math.floor(Math.random() * NODOS_IDS.length)];
-  const esError  = Math.random() < 0.1;
+  const nodo_id = NODOS_IDS[Math.floor(Math.random() * NODOS_IDS.length)];
+  // 10% de probabilidad de que sea un error para probar las alertas
+  const esError = Math.random() < 0.1;
 
   const vatios_generados = esError ? aleatorio(200, 1500) : aleatorio(2000, 5000);
-  const voltaje          = esError ? aleatorio(160, 200)  : aleatorio(210, 240);
+  const voltaje = esError ? aleatorio(160, 200) : aleatorio(210, 240);
 
   const { criticidad, status_code, mensaje } = determinarCriticidad(vatios_generados, voltaje);
 
@@ -48,7 +49,7 @@ const generarMetrica = () => {
 };
 
 const enviarMetrica = () => {
-  const datos  = generarMetrica();
+  const datos = generarMetrica();
   const cuerpo = JSON.stringify(datos);
 
   const opciones = {

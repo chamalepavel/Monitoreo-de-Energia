@@ -1,0 +1,48 @@
+# ============================================================
+# docker-compose.yml
+# ¿Qué hace este archivo?
+# Le dice a Docker que levante un servidor de PostgreSQL
+# sin que tengamos que instalarlo manualmente en nuestra PC.
+# Docker lo "empaqueta" todo y lo corre como si fuera una
+# mini-computadora dentro de la tuya.
+# ============================================================
+
+version: '3.8'  # Versión del formato de Docker Compose
+
+services:
+  # Este es nuestro servicio de base de datos
+  postgres:
+    image: postgres:15        # Usamos la versión 15 de PostgreSQL (estable)
+    container_name: monitoreo_solar_db  # Nombre del contenedor (como un apodo)
+    
+    # Variables de entorno: configuran el usuario, contraseña y nombre de la BD
+    environment:
+      POSTGRES_USER: admin           # Usuario de la base de datos
+      POSTGRES_PASSWORD: admin123    # Contraseña (en producción real sería más segura)
+      POSTGRES_DB: monitoreo_solar   # Nombre de la base de datos que se creará sola
+    
+    # Puertos: "puerto_de_tu_PC:puerto_del_contenedor"
+    # Así puedes conectarte desde tu PC al PostgreSQL que corre en Docker
+    ports:
+      - "5434:5432"
+    # ⚠️ Usamos el puerto 5434 porque el 5432 y 5433 están ocupados
+    # por instalaciones locales de PostgreSQL.
+    # El contenedor sigue usando 5432 internamente, pero desde tu PC
+    # te conectas al puerto 5434.
+    
+    # Volúmenes: sirven para que los datos NO se borren cuando apagas Docker
+    # Sin esto, cada vez que pares Docker perderías todos tus datos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # Guarda los datos de la BD
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Ejecuta nuestro script SQL al inicio
+    
+    # Para saber si PostgreSQL está listo antes de que otros servicios intenten conectarse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d monitoreo_solar"]
+      interval: 10s   # Revisa cada 10 segundos
+      timeout: 5s     # Espera máximo 5 segundos por respuesta
+      retries: 5      # Intenta 5 veces antes de declarar error
+
+# Declaramos el volumen para que Docker lo administre
+volumes:
+  postgres_data:

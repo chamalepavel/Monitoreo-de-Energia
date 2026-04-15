@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 
+// si cambia el puerto del backend, cambiarlo aqui tambien
 const SOCKET_URL = 'http://localhost:4000';
 
 const useSocket = (token) => {
-  const [conectado, setConectado]       = useState(false);
+  const [conectado, setConectado] = useState(false);
   const [nuevaMetrica, setNuevaMetrica] = useState(null);
   const [alertaCritica, setAlertaCritica] = useState(null);
 

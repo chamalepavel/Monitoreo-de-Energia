@@ -10,10 +10,10 @@ import {
   obtenerEstadoNodos,
 } from './services/api';
 
-import GraficaLinea  from './components/GraficaLinea';
+import GraficaLinea from './components/GraficaLinea';
 import GraficaBarras from './components/GraficaBarras';
-import GraficaDona   from './components/GraficaDona';
-import TablaLogs     from './components/TablaLogs';
+import GraficaDona from './components/GraficaDona';
+import TablaLogs from './components/TablaLogs';
 import AlertaCritica from './components/AlertaCritica';
 
 const PantallaLogin = () => {
@@ -53,14 +53,14 @@ const PantallaLogin = () => {
 const App = () => {
   const { isAuthenticated, isLoading, user, logout, getAccessTokenSilently } = useAuth0();
 
-  const [token, setToken]                       = useState(null);
-  const [nodos, setNodos]                       = useState([]);
+  const [token, setToken] = useState(null);
+  const [nodos, setNodos] = useState([]);
   const [nodoSeleccionado, setNodoSeleccionado] = useState(null);
-  const [datosLinea, setDatosLinea]             = useState([]);
-  const [datosBarras, setDatosBarras]           = useState([]);
-  const [agrupacion, setAgrupacion]             = useState('dia');
-  const [datosDona, setDatosDona]               = useState([]);
-  const [metricas, setMetricas]                 = useState([]);
+  const [datosLinea, setDatosLinea] = useState([]);
+  const [datosBarras, setDatosBarras] = useState([]);
+  const [agrupacion, setAgrupacion] = useState('dia');
+  const [datosDona, setDatosDona] = useState([]);
+  const [metricas, setMetricas] = useState([]);
 
   const { conectado, nuevaMetrica, alertaCritica } = useSocket(token);
 
@@ -87,6 +87,7 @@ const App = () => {
 
     const cargarDatosIniciales = async () => {
       try {
+        // cargo todo junto para no hacer 4 peticiones seguidas y que se vea raro
         const [listaNodos, historico, estados, ultimasMetricas] = await Promise.all([
           obtenerNodos(token),
           obtenerHistorico(token, 'dia'),
@@ -99,6 +100,7 @@ const App = () => {
         setDatosDona(estados);
         setMetricas(ultimasMetricas);
 
+        // seleccionar el primero por defecto
         if (listaNodos.length > 0) {
           setNodoSeleccionado(listaNodos[0].id);
         }
@@ -197,10 +199,7 @@ const App = () => {
       <main className="dashboard-contenedor">
 
         <div className="seccion">
-          <div className="seccion-header">
-            <span className="seccion-numero">01</span>
-            <span className="seccion-titulo">Seleccion de Nodo</span>
-          </div>
+          <h2 className="seccion-titulo">Seleccion de Nodo</h2>
 
           <div className="selector-nodo">
             <label>Nodo activo</label>
@@ -218,10 +217,7 @@ const App = () => {
         </div>
 
         <div className="seccion">
-          <div className="seccion-header">
-            <span className="seccion-numero">02</span>
-            <span className="seccion-titulo">Metricas en Tiempo Real</span>
-          </div>
+          <h2 className="seccion-titulo">Metricas en Tiempo Real</h2>
 
           <div className="graficas-grid">
             <GraficaLinea
@@ -238,10 +234,7 @@ const App = () => {
         </div>
 
         <div className="seccion">
-          <div className="seccion-header">
-            <span className="seccion-numero">03</span>
-            <span className="seccion-titulo">Estado de la Red</span>
-          </div>
+          <h2 className="seccion-titulo">Estado de la Red</h2>
 
           <div className="graficas-grid">
             <GraficaDona datos={datosDona} />
@@ -282,10 +275,7 @@ const App = () => {
         </div>
 
         <div className="seccion">
-          <div className="seccion-header">
-            <span className="seccion-numero">04</span>
-            <span className="seccion-titulo">Registro de Eventos</span>
-          </div>
+          <h2 className="seccion-titulo">Registro de Eventos</h2>
 
           <TablaLogs
             metricas={metricas}

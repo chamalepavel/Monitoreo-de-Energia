@@ -45,23 +45,13 @@ const GraficaLinea = ({ datosIniciales = [], nuevaMetrica, nodoId }) => {
     );
   }
 
-  const TooltipSwiss = ({ active, payload, label }) => {
+  // tooltip personalizado para que combine con el diseño del dashboard
+  const TooltipPersonalizado = ({ active, payload, label }) => {
     if (!active || !payload || !payload.length) return null;
     return (
-      <div style={{
-        backgroundColor: '#FFFFFF',
-        border: '1.5px solid #1A1A1A',
-        borderRadius: 0,
-        padding: '8px 12px',
-        fontFamily: 'Inter, Helvetica Neue, Arial, sans-serif',
-      }}>
-        <p style={{ fontSize: '0.5625rem', fontWeight: 700, letterSpacing: '0.12em',
-          textTransform: 'uppercase', color: '#6B6B6B', marginBottom: 4 }}>
-          {label}
-        </p>
-        <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#D62B2B' }}>
-          {payload[0].value.toFixed(1)} W
-        </p>
+      <div className="tooltip-grafica">
+        <p className="tooltip-hora">{label}</p>
+        <p className="tooltip-valor">{payload[0].value.toFixed(1)} W</p>
       </div>
     );
   };
@@ -87,7 +77,7 @@ const GraficaLinea = ({ datosIniciales = [], nuevaMetrica, nodoId }) => {
             tickFormatter={(v) => `${v}W`}
             width={48}
           />
-          <Tooltip content={<TooltipSwiss />} cursor={{ stroke: '#D0D0CC', strokeWidth: 1 }} />
+          <Tooltip content={<TooltipPersonalizado />} cursor={{ stroke: '#D0D0CC', strokeWidth: 1 }} />
           <Line
             type="monotone"
             dataKey="vatios"

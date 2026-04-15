@@ -258,6 +258,7 @@ body {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--texto);
+  margin-bottom: var(--esp-xl);
 }
 
 .selector-nodo {
@@ -605,6 +606,27 @@ body {
 @keyframes entrarDesdeAbajo {
   from { transform: translateY(16px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* tooltip de las graficas */
+.tooltip-grafica {
+  background-color: var(--fondo);
+  border: 1px solid var(--borde-fuerte);
+  padding: 8px 12px;
+}
+
+.tooltip-hora {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  margin-bottom: 4px;
+}
+
+.tooltip-valor {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--acento);
 }
 
 .agrupacion-btn-grupo {

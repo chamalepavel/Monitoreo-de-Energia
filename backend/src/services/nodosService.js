@@ -16,6 +16,7 @@ const obtenerNodoPorId = async (id) => {
      WHERE id = $1`,
     [id]
   );
+  // devuelve null si no existe, el controller se encarga del 404
   return resultado.rows[0] || null;
 };
 

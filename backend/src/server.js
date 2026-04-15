@@ -1,11 +1,11 @@
 require('dotenv').config();
 
-const express    = require('express');
-const http       = require('http');
+const express = require('express');
+const http = require('http');
 const { Server } = require('socket.io');
-const cors       = require('cors');
+const cors = require('cors');
 
-const rutasNodos    = require('./routes/nodos');
+const rutasNodos = require('./routes/nodos');
 const rutasMetricas = require('./routes/metricas');
 
 const app = express();
@@ -89,7 +89,7 @@ const PUERTO = process.env.PORT || 4000;
 httpServer.listen(PUERTO, () => {
   console.log('');
   console.log('Sistema de Monitoreo Solar IoT');
-  console.log(`Servidor corriendo en http://localhost:${PUERTO}`);
-  console.log(`API disponible en   http://localhost:${PUERTO}/api`);
+  console.log(`Servidor en http://localhost:${PUERTO}`);
+  console.log(`API en http://localhost:${PUERTO}/api`);
   console.log('');
 });

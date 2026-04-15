@@ -42,9 +42,9 @@ CREATE INDEX IF NOT EXISTS idx_metricas_criticidad ON metricas_log(criticidad);
 
 
 INSERT INTO nodos (nombre, ubicacion, version_fw) VALUES
-    ('Inversor Central Mixco',    'Techo A1, Zona Industrial Mixco',    'v2.3.1'),
-    ('Panel Solar Villa Nueva',   'Techo B2, Centro Comercial VN',      'v2.3.1'),
-    ('Inversor Zona 10',          'Techo Corporativo, Torre Reforma',   'v2.1.0'),
-    ('Panel Solar Quetzaltenango','Instalacion Industrial Xela',        'v1.9.5'),
-    ('Inversor Escuintla Norte',  'Planta Solar Escuintla, Sector 3',   'v2.3.1')
+    ('Inversor Central Mixco',    'Panel Solar A1, Zona Industrial Mixco',    'v2.3.1'),
+    ('Panel Solar Villa Nueva',   'Panel Solar B2, Centro Comercial VN',      'v2.3.1'),
+    ('Inversor Zona 10',          'Panel Solar Corporativo, Torre Reforma',   'v2.1.0'),
+    ('Panel Solar Quetzaltenango','Panel Solar Industrial, Xela',             'v1.9.5'),
+    ('Inversor Escuintla Norte',  'Panel Solar Norte, Escuintla Sector 3',    'v2.3.1')
 ON CONFLICT (nombre) DO NOTHING;

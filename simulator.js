@@ -1,14 +1,16 @@
 const http = require('http');
+const { Pool } = require('pg');
 
-const API_URL = 'http://localhost:4000/api/metricas';
+const BACKEND_HOST = process.env.BACKEND_HOST || 'localhost';
+const BACKEND_PORT = parseInt(process.env.BACKEND_PORT || '4000', 10);
 
-const NODOS_IDS = [
-  '93093cfa-bc67-449a-b705-b41520e62bad',
-  'ad669bf5-3be2-46d1-8253-5986efdf4a53',
-  'afa82e60-5b98-4ed4-81ea-25ae2aca680a',
-  '06f9b60c-fd67-474e-acb3-b92331dc89ab',
-  '977933d5-cfcf-4d77-8290-9c1cbc6b4e4a',
-];
+const pool = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  database: process.env.DB_NAME || 'monitoreo_solar',
+  user: process.env.DB_USER || 'admin',
+  password: process.env.DB_PASSWORD || 'admin123',
+});
 
 const aleatorio = (min, max) =>
   Math.round((Math.random() * (max - min) + min) * 100) / 100;
@@ -35,9 +37,13 @@ const determinarCriticidad = (vatios, voltaje) => {
   };
 };
 
-const generarMetrica = () => {
-  const nodo_id = NODOS_IDS[Math.floor(Math.random() * NODOS_IDS.length)];
-  // 10% de probabilidad de que sea un error para probar las alertas
+const obtenerNodos = async () => {
+  const resultado = await pool.query('SELECT id FROM nodos');
+  return resultado.rows.map((r) => r.id);
+};
+
+const generarMetrica = (nodosIds) => {
+  const nodo_id = nodosIds[Math.floor(Math.random() * nodosIds.length)];
   const esError = Math.random() < 0.1;
 
   const vatios_generados = esError ? aleatorio(200, 1500) : aleatorio(2000, 5000);
@@ -48,13 +54,13 @@ const generarMetrica = () => {
   return { nodo_id, vatios_generados, voltaje, status_code, criticidad, mensaje };
 };
 
-const enviarMetrica = () => {
-  const datos = generarMetrica();
+const enviarMetrica = (nodosIds) => {
+  const datos = generarMetrica(nodosIds);
   const cuerpo = JSON.stringify(datos);
 
   const opciones = {
-    hostname: 'localhost',
-    port: 4000,
+    hostname: BACKEND_HOST,
+    port: BACKEND_PORT,
     path: '/api/metricas',
     method: 'POST',
     headers: {
@@ -86,17 +92,34 @@ const enviarMetrica = () => {
 
   req.on('error', (error) => {
     console.error('No se pudo conectar al backend:', error.message);
-    console.error('Asegurate de que el backend esta corriendo: npm run dev (en /backend)');
   });
 
   req.write(cuerpo);
   req.end();
 };
 
-console.log('Simulador de Nodos Solares');
-console.log('Enviando metricas cada 5 segundos...');
-console.log('Presiona Ctrl+C para detener');
-console.log('');
+const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-enviarMetrica();
-setInterval(enviarMetrica, 5000);
+const iniciar = async () => {
+  console.log('Simulador de Nodos Solares');
+  console.log('Enviando metricas cada 5 segundos...');
+  console.log('Presiona Ctrl+C para detener');
+  console.log('');
+
+  let nodosIds = [];
+
+  while (nodosIds.length === 0) {
+    try {
+      nodosIds = await obtenerNodos();
+      console.log(`Nodos cargados: ${nodosIds.length}`);
+    } catch (err) {
+      console.log('Esperando a la base de datos... reintentando en 3s');
+      await esperar(3000);
+    }
+  }
+
+  enviarMetrica(nodosIds);
+  setInterval(() => enviarMetrica(nodosIds), 5000);
+};
+
+iniciar();

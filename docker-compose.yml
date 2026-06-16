@@ -1,0 +1,68 @@
+services:
+  db:
+    image: postgres:15
+    container_name: monitoreo_solar_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: monitoreo_solar
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d monitoreo_solar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: monitoreo_solar_backend
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: monitoreo_solar
+      DB_USER: admin
+      DB_PASSWORD: admin123
+      AUTH0_DOMAIN: dev-qbr87jo84s7l6pkx.us.auth0.com
+      AUTH0_AUDIENCE: https://monitoreo-solar-api
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  simulator:
+    build: ./backend
+    container_name: monitoreo_solar_simulator
+    command: node /app/simulator.js
+    volumes:
+      - ./simulator.js:/app/simulator.js
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: monitoreo_solar
+      DB_USER: admin
+      DB_PASSWORD: admin123
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    container_name: monitoreo_solar_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
